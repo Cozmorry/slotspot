@@ -44,7 +44,30 @@ class AvailabilityService {
       startAt: startAt,
       endAt: endAt,
     );
+    // Combine with simple crowd estimate if available in the future
     return used < option.capacity;
+  }
+
+  /// Count reservations that are active right now (startAt <= now < endAt)
+  Future<int> countActiveNow({required String lotId, required String zoneId, DateTime? now}) async {
+    final DateTime ts = (now ?? DateTime.now());
+    final qs = await db
+        .collection('reservations')
+        .where('lotId', isEqualTo: lotId)
+        .where('zoneId', isEqualTo: zoneId)
+        .where('status', isEqualTo: 'active')
+        .get();
+    int active = 0;
+    for (final d in qs.docs) {
+      final data = d.data();
+      final start = (data['startAt'] as Timestamp).toDate();
+      final end = (data['endAt'] as Timestamp).toDate();
+      if (!ts.isBefore(end) || ts.isBefore(start)) {
+        continue;
+      }
+      active++;
+    }
+    return active;
   }
 }
 

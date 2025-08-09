@@ -16,29 +16,28 @@ class AnalyticsScreenView extends ConsumerWidget {
       capacity: 120,
     );
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: () async {},
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: [
           Text('Demand prediction (next 12h)', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
-          Expanded(
-            child: ListView.separated(
-              itemCount: prediction.points.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final p = prediction.points[index];
-                final time = TimeOfDay.fromDateTime(p.timestamp).format(context);
-                final percent = (p.utilization * 100).toStringAsFixed(0);
-                return ListTile(
+          ...List.generate(prediction.points.length, (index) {
+            final p = prediction.points[index];
+            final time = TimeOfDay.fromDateTime(p.timestamp).format(context);
+            final percent = (p.utilization * 100).toStringAsFixed(0);
+            return Column(
+              children: [
+                ListTile(
                   title: Text('$time  —  ${p.predictedOccupied}/${p.capacity} occupied'),
                   subtitle: LinearProgressIndicator(value: p.utilization),
                   trailing: Text('$percent%'),
-                );
-              },
-            ),
-          ),
+                ),
+                const Divider(height: 1),
+              ],
+            );
+          }),
         ],
       ),
     );
