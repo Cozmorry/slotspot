@@ -10,6 +10,7 @@ import 'features/auth/sign_in_screen.dart';
 import 'features/settings/theme_controller.dart';
 import 'features/reservations/reserve_screen.dart';
 import 'features/crowd/crowd_screen.dart';
+import 'features/feedback/feedback_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,7 +103,7 @@ class CrowdsourceScreen extends StatelessWidget {
 class FeedbackScreen extends StatelessWidget {
   const FeedbackScreen({super.key});
   @override
-  Widget build(BuildContext context) => const Center(child: Text('Feedback'));
+  Widget build(BuildContext context) => const FeedbackScreenView();
 }
 
 class AnalyticsScreen extends StatelessWidget {

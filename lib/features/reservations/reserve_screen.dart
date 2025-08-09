@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../auth/auth_providers.dart';
+import '../../ui/widgets.dart';
 import 'models.dart';
 import 'repository.dart';
 import 'availability_service.dart';
@@ -47,46 +49,7 @@ class _ReserveViewState extends ConsumerState<ReserveView> {
     });
   }
 
-  Future<void> _showQrBottomSheet(String reservationId) async {
-    if (!context.mounted) return;
-    await showModalBottomSheet(
-      context: context,
-      showDragHandle: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Reservation QR', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 16)],
-              ),
-              child: QrImageView(data: reservationId, version: QrVersions.auto, size: 220, backgroundColor: Colors.white),
-            ),
-            const SizedBox(height: 12),
-            SelectableText(reservationId, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => ReservationDetailScreen(reservationId: reservationId),
-                ));
-              },
-              icon: const Icon(Icons.open_in_new),
-              label: const Text('Open full screen'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // QR is rendered inline below the list via _QrCard
 
   @override
   Widget build(BuildContext context) {
@@ -95,12 +58,18 @@ class _ReserveViewState extends ConsumerState<ReserveView> {
     final availability = ref.watch(availabilityServiceProvider);
     final userId = authUser?.uid;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Reserve a slot', style: Theme.of(context).textTheme.titleLarge),
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 300));
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          const SectionTitle('Reserve a slot'),
           const SizedBox(height: 12),
           DropdownButtonFormField<LotZoneOption>(
             value: _option,
@@ -142,28 +111,26 @@ class _ReserveViewState extends ConsumerState<ReserveView> {
                       messenger.showSnackBar(const SnackBar(content: Text('No capacity available for this time window.')));
                       return;
                     }
-                    final id = await repo.createReservation(userId: userId, option: _option, startAt: _start, endAt: _end);
-                    setState(() {}); // trigger UI to refresh list below
+                   await repo.createReservation(userId: userId, option: _option, startAt: _start, endAt: _end);
+                   setState(() {}); // trigger UI to refresh list below
                     messenger.showSnackBar(const SnackBar(content: Text('Reservation created')));
-                    await _showQrBottomSheet(id);
                   },
             icon: const Icon(Icons.event_available),
             label: const Text('Reserve'),
           ),
           const SizedBox(height: 24),
-          Expanded(
-            child: userId == null
-                ? const Center(child: Text('Sign in to view reservations'))
-                : _UserReservationsList(userId: userId),
-          ),
+          userId == null
+              ? const EmptyState(icon: Icons.login, title: 'Sign in to view reservations')
+              : _ReservationsAndQr(userId: userId),
         ],
       ),
+    ),
     );
   }
 }
 
-class _UserReservationsList extends ConsumerWidget {
-  const _UserReservationsList({required this.userId});
+class _ReservationsAndQr extends ConsumerWidget {
+  const _ReservationsAndQr({required this.userId});
   final String userId;
 
   @override
@@ -183,38 +150,129 @@ class _UserReservationsList extends ConsumerWidget {
           if (aActive != bActive) return bActive ? 1 : -1; // true first
           return b.startAt.compareTo(a.startAt);
         });
+        final top = items.take(3).toList();
+        final active = items.firstWhere(
+          (r) => r.status == 'active' && now.isBefore(r.endAt),
+          orElse: () => top.isNotEmpty ? top.first : items.first,
+        );
 
-        return ListView.separated(
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final r = items[index];
-            final now = DateTime.now();
-            final isExpired = now.isAfter(r.endAt);
-            final isInactive = isExpired || r.status != 'active';
-            return ListTile(
-              enabled: !isInactive,
-              title: Text('${r.lotName} — ${r.zoneName}'),
-              subtitle: Text('${r.startAt} → ${r.endAt}'),
-              onTap: isInactive
-                  ? null
-                  : () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => ReservationDetailScreen(reservationId: r.id)),
-                      );
-                    },
-              trailing: isExpired
-                  ? Text('expired', style: Theme.of(context).textTheme.bodySmall)
-                  : (r.status == 'active'
-                      ? TextButton(
-                          onPressed: () => repo.cancelReservation(r.id),
-                          child: const Text('Cancel'),
-                        )
-                      : Text(r.status, style: Theme.of(context).textTheme.bodySmall)),
-            );
-          },
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: top.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final r = top[index];
+                final isExpired = now.isAfter(r.endAt);
+                final isInactive = isExpired || r.status != 'active';
+                return ListTile(
+                  enabled: !isInactive,
+                  title: Text('${r.lotName} — ${r.zoneName}'),
+                  subtitle: Text('${r.startAt} → ${r.endAt}'),
+                  onTap: isInactive
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => ReservationDetailScreen(reservationId: r.id)),
+                          );
+                        },
+                  trailing: isExpired
+                      ? Text('expired', style: Theme.of(context).textTheme.bodySmall)
+                      : (r.status == 'active'
+                          ? TextButton(
+                              onPressed: () => repo.cancelReservation(r.id),
+                              child: const Text('Cancel'),
+                            )
+                          : Text(r.status, style: Theme.of(context).textTheme.bodySmall)),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            _QrCard(reservation: active),
+          ],
         );
       },
+    );
+  }
+}
+
+class _QrCard extends StatelessWidget {
+  const _QrCard({required this.reservation});
+  final Reservation reservation;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final isExpired = now.isAfter(reservation.endAt);
+    final isCancelled = reservation.status != 'active';
+    final isInactive = isExpired || isCancelled;
+    final stateLabel = isExpired ? 'expired' : (isCancelled ? 'cancelled' : null);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Your QR code', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Text('${reservation.lotName} — ${reservation.zoneName}', style: Theme.of(context).textTheme.bodyMedium),
+          Text('${reservation.startAt} → ${reservation.endAt}', style: Theme.of(context).textTheme.bodySmall),
+          if (stateLabel != null) ...[
+            const SizedBox(height: 6),
+            Text(stateLabel, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+              child: Opacity(
+                opacity: isInactive ? 0.35 : 1.0,
+                child: QrImageView(
+                  data: reservation.id,
+                  version: QrVersions.auto,
+                  size: 180,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: isInactive
+                      ? null
+                      : () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => ReservationDetailScreen(reservationId: reservation.id)),
+                          ),
+                  icon: const Icon(Icons.fullscreen),
+                  label: const Text('Full screen'),
+                ),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: isInactive ? null : () => Share.share('SlotSpot reservation: ${reservation.id}'),
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

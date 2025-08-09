@@ -127,45 +127,22 @@ class _AvatarWithEdit extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String? photoUrl = user?.photoURL;
-    return Stack(
-      children: [
-        localPhotoAsync.when(
-          data: (localPath) {
-            ImageProvider? provider;
-            if (localPath != null && File(localPath).existsSync()) {
-              provider = FileImage(File(localPath));
-            } else if (photoUrl != null) {
-              provider = NetworkImage(photoUrl);
-            }
-            return CircleAvatar(
-              radius: 36,
-              backgroundImage: provider,
-              child: provider == null ? const Icon(Icons.person, size: 36) : null,
-            );
-          },
-          loading: () => const CircleAvatar(radius: 36, child: CircularProgressIndicator()),
-          error: (e, st) => const CircleAvatar(radius: 36, child: Icon(Icons.person)),
-        ),
-        Positioned(
-          right: -4,
-          bottom: -4,
-          child: Material(
-            color: Theme.of(context).colorScheme.primary,
-            shape: const CircleBorder(),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () async {
-                await ref.read(profilePhotoControllerProvider).pickAndSaveLocalProfilePhoto();
-                ref.invalidate(localProfilePhotoPathProvider);
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(6),
-                child: Icon(Icons.camera_alt, size: 16, color: Colors.white),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return localPhotoAsync.when(
+      data: (localPath) {
+        ImageProvider? provider;
+        if (localPath != null && File(localPath).existsSync()) {
+          provider = FileImage(File(localPath));
+        } else if (photoUrl != null) {
+          provider = NetworkImage(photoUrl);
+        }
+        return CircleAvatar(
+          radius: 36,
+          backgroundImage: provider,
+          child: provider == null ? const Icon(Icons.person, size: 36) : null,
+        );
+      },
+      loading: () => const CircleAvatar(radius: 36, child: CircularProgressIndicator()),
+      error: (e, st) => const CircleAvatar(radius: 36, child: Icon(Icons.person)),
     );
   }
 }

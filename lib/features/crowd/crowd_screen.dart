@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../services/permission_service.dart';
+import '../../ui/widgets.dart';
 import '../auth/auth_providers.dart';
 import '../reservations/models.dart';
 import 'models.dart';
@@ -35,7 +36,7 @@ class _CrowdScreenViewState extends ConsumerState<CrowdScreenView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Report slot availability', style: Theme.of(context).textTheme.titleLarge),
+          const SectionTitle('Report slot availability'),
           const SizedBox(height: 12),
           DropdownButtonFormField<LotZoneOption>(
             value: _option,
