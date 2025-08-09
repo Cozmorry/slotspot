@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "536638602721",
+    "project_id": "slotpot-22c6d",
+    "storage_bucket": "slotpot-22c6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536638602721:android:a4623575a23ada3d00a6a0",
+        "android_client_info": {
+          "package_name": "com.cozysoftware.slotspot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "536638602721-8n9vjeoo2paqelfd0ps3a2roi7v17q6n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cozysoftware.slotspot",
+            "certificate_hash": "80fab335cd9d09abd3e36a12ee2a2995dd3db39e"
+          }
+        },
+        {
+          "client_id": "536638602721-lvgnqdq01h5u40k6bk45nbu2jr529k6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMAFlDZKNDknoiRu09CibJ5glmeDO7gMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "536638602721-lvgnqdq01h5u40k6bk45nbu2jr529k6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
