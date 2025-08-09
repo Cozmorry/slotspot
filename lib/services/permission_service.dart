@@ -12,6 +12,14 @@ class PermissionService {
     final result = await Permission.photos.request();
     return result.isGranted;
   }
+
+  Future<bool> ensureLocationPermission() async {
+    // Check both fine and coarse; request the one mapped by plugin
+    var status = await Permission.location.status;
+    if (status.isGranted) return true;
+    status = await Permission.location.request();
+    return status.isGranted;
+  }
 }
 
 

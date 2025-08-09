@@ -8,6 +8,8 @@ import 'features/profile/profile_screen.dart';
 import 'features/auth/auth_providers.dart';
 import 'features/auth/sign_in_screen.dart';
 import 'features/settings/theme_controller.dart';
+import 'features/reservations/reserve_screen.dart';
+import 'features/crowd/crowd_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,13 +90,13 @@ class RootShell extends StatelessWidget {
 class ReserveScreen extends StatelessWidget {
   const ReserveScreen({super.key});
   @override
-  Widget build(BuildContext context) => const Center(child: Text('Reserve'));
+  Widget build(BuildContext context) => const ReserveView();
 }
 
 class CrowdsourceScreen extends StatelessWidget {
   const CrowdsourceScreen({super.key});
   @override
-  Widget build(BuildContext context) => const Center(child: Text('Crowdsource'));
+  Widget build(BuildContext context) => const CrowdScreenView();
 }
 
 class FeedbackScreen extends StatelessWidget {
