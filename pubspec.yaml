@@ -1,5 +1,5 @@
 name: slotspot
-description: "A new Flutter project."
+description: "SlotSpot - Smart Parking Management App"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -51,6 +51,8 @@ dependencies:
   qr_flutter: ^4.1.0
   share_plus: ^10.0.2
   add_2_calendar: ^3.0.1
+  # tflite_flutter: ^0.9.5  # Temporarily disabled due to Android compatibility issues
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +85,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/brand/
+    - assets/models/
 
 flutter_launcher_icons:
   android: true
