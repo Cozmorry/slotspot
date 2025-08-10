@@ -46,7 +46,7 @@ class AvailabilityStateNotifier extends StateNotifier<Map<String, RealisticAvail
   
   final RealisticCrowdService _service;
 
-  String _getKey(String lotId, String zoneId) => '${lotId}_${zoneId}';
+  String _getKey(String lotId, String zoneId) => '${lotId}_$zoneId';
 
   Future<RealisticAvailability> getAvailability({
     required String lotId,
