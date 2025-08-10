@@ -28,7 +28,7 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const lavenderSeed = Color(0xFFB57EDC); // default lavender
+    const primarySeed = Color(0xFF2196F3); // Modern blue - perfect for parking apps
 
     final authAsync = ref.watch(authStateChangesProvider);
     final router = _createRouter(authAsync);
@@ -41,14 +41,14 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: lavenderSeed,
+          seedColor: primarySeed,
           brightness: Brightness.light,
         ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: lavenderSeed,
+          seedColor: primarySeed,
           brightness: Brightness.dark,
         ),
       ),
