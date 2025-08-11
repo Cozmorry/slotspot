@@ -41,7 +41,7 @@ class SignInScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SvgPicture.asset('assets/brand/slotspot_logo.svg', height: 84),
+                          SvgPicture.asset('assets/brand/slotspot_logo_new.svg', height: 120),
                           const SizedBox(height: 16),
                           Text('SlotSpot', style: Theme.of(context).textTheme.headlineSmall),
                           const SizedBox(height: 10),

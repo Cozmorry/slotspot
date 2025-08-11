@@ -1,0 +1,105 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Modern blue gradient matching our app theme -->
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2196F3"/>
+      <stop offset="100%" stop-color="#1976D2"/>
+    </linearGradient>
+    
+    <!-- Accent gradient for highlights -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#42A5F5"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    
+    <!-- Inner shadow for depth -->
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Main background circle with modern gradient -->
+  <circle cx="256" cy="256" r="240" fill="url(#primaryGrad)" filter="url(#shadow)"/>
+  
+  <!-- Inner circle for depth -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+  
+  <!-- Parking lot grid representation -->
+  <g transform="translate(256, 200)">
+    <!-- Main parking structure - modern geometric design -->
+    <rect x="-80" y="-40" width="160" height="80" rx="12" fill="rgba(255,255,255,0.95)" filter="url(#innerShadow)"/>
+    
+    <!-- Parking slots - individual rectangles -->
+    <g fill="url(#accentGrad)">
+      <!-- Top row -->
+      <rect x="-70" y="-30" width="24" height="12" rx="2"/>
+      <rect x="-40" y="-30" width="24" height="12" rx="2"/>
+      <rect x="-10" y="-30" width="24" height="12" rx="2"/>
+      <rect x="20" y="-30" width="24" height="12" rx="2"/>
+      <rect x="50" y="-30" width="24" height="12" rx="2"/>
+      
+      <!-- Bottom row -->
+      <rect x="-70" y="20" width="24" height="12" rx="2"/>
+      <rect x="-40" y="20" width="24" height="12" rx="2"/>
+      <rect x="-10" y="20" width="24" height="12" rx="2"/>
+      <rect x="20" y="20" width="24" height="12" rx="2"/>
+      <rect x="50" y="20" width="24" height="12" rx="2"/>
+    </g>
+    
+    <!-- Center road/path -->
+    <rect x="-75" y="-8" width="150" height="16" rx="8" fill="rgba(255,255,255,0.8)"/>
+    
+    <!-- Smart indicator dots (representing IoT/sensors) -->
+    <g fill="#4CAF50">
+      <circle cx="-55" cy="-24" r="3" opacity="0.8"/>
+      <circle cx="-25" cy="-24" r="3" opacity="0.8"/>
+      <circle cx="5" cy="-24" r="3" opacity="0.8"/>
+      <circle cx="35" cy="-24" r="3" opacity="0.8"/>
+      <circle cx="65" cy="-24" r="3" opacity="0.8"/>
+    </g>
+  </g>
+  
+  <!-- Location pin with modern design -->
+  <g transform="translate(256, 120)">
+    <!-- Pin shadow -->
+    <ellipse cx="0" cy="65" rx="8" ry="4" fill="rgba(0,0,0,0.2)"/>
+    
+    <!-- Pin body -->
+    <path d="M0,-20 C-15,-20 -27,-8 -27,7 C-27,25 0,65 0,65 S27,25 27,7 C27,-8 15,-20 0,-20Z" 
+          fill="rgba(255,255,255,0.95)" filter="url(#innerShadow)"/>
+    
+    <!-- Pin inner circle -->
+    <circle cx="0" cy="7" r="12" fill="url(#accentGrad)"/>
+    
+    <!-- Pin center dot -->
+    <circle cx="0" cy="7" r="4" fill="rgba(255,255,255,0.9)"/>
+  </g>
+  
+  <!-- Modern app name -->
+  <g transform="translate(256, 380)">
+    <text x="0" y="0" text-anchor="middle" 
+          font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" 
+          font-size="48" 
+          font-weight="700" 
+          fill="rgba(255,255,255,0.95)"
+          letter-spacing="1px">SlotSpot</text>
+    
+    <!-- Subtle underline -->
+    <rect x="-65" y="8" width="130" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+  </g>
+  
+  <!-- Smart tech indicators - small dots around the logo -->
+  <g fill="rgba(255,255,255,0.4)">
+    <circle cx="120" cy="150" r="2"/>
+    <circle cx="392" cy="150" r="2"/>
+    <circle cx="120" cy="362" r="2"/>
+    <circle cx="392" cy="362" r="2"/>
+    <circle cx="80" cy="256" r="2"/>
+    <circle cx="432" cy="256" r="2"/>
+  </g>
+</svg>

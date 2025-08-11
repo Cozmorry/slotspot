@@ -90,16 +90,16 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/brand/slotspot_logo1024.png
-  adaptive_icon_background: "#B57EDC"
-  adaptive_icon_foreground: assets/brand/slotspot_logo1024.png
+  image_path: assets/brand/slotspot_logo_new1024.png
+  adaptive_icon_background: "#2196F3"
+  adaptive_icon_foreground: assets/brand/slotspot_logo_new1024.png
 
 flutter_native_splash:
-  color: "#B57EDC"
-  image: assets/brand/slotspot_splash_safe.png
+  color: "#2196F3"
+  image: assets/brand/slotspot_logo_new1024.png
   android_12:
-    color: "#B57EDC"
-    image: assets/brand/slotspot_splash_safe.png
+    color: "#2196F3"
+    image: assets/brand/slotspot_logo_new1024.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
