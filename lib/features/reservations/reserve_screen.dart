@@ -63,376 +63,355 @@ class _ReserveViewState extends ConsumerState<ReserveView> {
         setState(() {});
         await Future.delayed(const Duration(milliseconds: 300));
       },
-      child: SingleChildScrollView(
+      child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    Theme.of(context).colorScheme.primaryContainer.withOpacity(0.05),
-                  ],
+        slivers: [
+          // Sticky Header
+          SliverAppBar(
+            expandedHeight: 80.0,
+            floating: false,
+            pinned: true,
+            toolbarHeight: 60.0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      Theme.of(context).colorScheme.primaryContainer.withOpacity(0.05),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.event_available_rounded,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Reserve Parking',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+            ),
+          ),
+          
+          // Scrollable Content
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                        Theme.of(context).colorScheme.surfaceContainer,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).shadowColor.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              Icons.event_available_rounded,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              size: 28,
+                              Icons.settings_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Reservation Details',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      
+                      // Zone Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                          ),
+                        ),
+                        child: DropdownButtonFormField<LotZoneOption>(
+                          value: _option,
+                          items: [
+                            for (final o in defaultSaritOptions)
+                              DropdownMenuItem(
+                                value: o,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_rounded,
+                                      size: 20,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text('${o.lotName} — ${o.zoneName}'),
+                                  ],
+                                ),
+                              ),
+                          ],
+                          onChanged: (v) => setState(() => _option = v ?? _option),
+                          decoration: InputDecoration(
+                            labelText: 'Select Parking Zone',
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(16),
+                            prefixIcon: Icon(
+                              Icons.map_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Time Selection
+                      Row(
+                        children: [
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Reserve Parking',
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ),
-                                Text(
-                                  'Book your parking slot in advance',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            // Reservation Form Section
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                          Theme.of(context).colorScheme.surfaceContainer,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor.withOpacity(0.1),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
+                            child: Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                ),
                               ),
-                              child: Icon(
-                                Icons.settings_rounded,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 24,
+                              child: OutlinedButton.icon(
+                                onPressed: () => _pickDateTime(context, true),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  side: BorderSide.none,
+                                  padding: const EdgeInsets.all(16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.schedule_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                label: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Start Time',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    Text(
+                                      TimeOfDay.fromDateTime(_start).format(context),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Reservation Details',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                ),
                               ),
+                              child: OutlinedButton.icon(
+                                onPressed: () => _pickDateTime(context, false),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  side: BorderSide.none,
+                                  padding: const EdgeInsets.all(16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.timelapse_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                label: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'End Time',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    Text(
+                                      TimeOfDay.fromDateTime(_end).format(context),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Reserve Button
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        
-                        // Zone Selection
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                            ),
-                          ),
-                          child: DropdownButtonFormField<LotZoneOption>(
-                            value: _option,
-                            items: [
-                              for (final o in defaultSaritOptions)
-                                DropdownMenuItem(
-                                  value: o,
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on_rounded,
-                                        size: 20,
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text('${o.lotName} — ${o.zoneName}'),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                            onChanged: (v) => setState(() => _option = v ?? _option),
-                            decoration: InputDecoration(
-                              labelText: 'Select Parking Zone',
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.all(16),
-                              prefixIcon: Icon(
-                                Icons.map_rounded,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Time Selection
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                                  ),
-                                ),
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _pickDateTime(context, true),
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    side: BorderSide.none,
-                                    padding: const EdgeInsets.all(16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  icon: Icon(
-                                    Icons.schedule_rounded,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                  label: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Start Time',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      Text(
-                                        TimeOfDay.fromDateTime(_start).format(context),
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                                  ),
-                                ),
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _pickDateTime(context, false),
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    side: BorderSide.none,
-                                    padding: const EdgeInsets.all(16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  icon: Icon(
-                                    Icons.timelapse_rounded,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                  label: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'End Time',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      Text(
-                                        TimeOfDay.fromDateTime(_end).format(context),
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 24),
-                        
-                        // Reserve Button
-                        Container(
-                          width: double.infinity,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context).colorScheme.primary,
-                                Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: FilledButton.icon(
-                            onPressed: userId == null ? null : () async {
-                              final messenger = ScaffoldMessenger.of(context);
-                              final hasSpace = await availability.hasCapacity(option: _option, startAt: _start, endAt: _end);
-                              if (!hasSpace) {
-                                messenger.showSnackBar(
-                                  SnackBar(
-                                    content: const Text('No capacity available for this time window.'),
-                                    backgroundColor: Colors.orange,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-                              await repo.createReservation(userId: userId, option: _option, startAt: _start, endAt: _end);
-                              setState(() {}); // trigger UI to refresh list below
+                        child: FilledButton.icon(
+                          onPressed: userId == null ? null : () async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            final hasSpace = await availability.hasCapacity(option: _option, startAt: _start, endAt: _end);
+                            if (!hasSpace) {
                               messenger.showSnackBar(
                                 SnackBar(
-                                  content: const Text('Reservation created successfully!'),
-                                  backgroundColor: Colors.green,
+                                  content: const Text('No capacity available for this time window.'),
+                                  backgroundColor: Colors.orange,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               );
-                            },
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                              return;
+                            }
+                            await repo.createReservation(userId: userId, option: _option, startAt: _start, endAt: _end);
+                            setState(() {}); // trigger UI to refresh list below
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: const Text('Reservation created successfully!'),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            icon: const Icon(Icons.event_available_rounded, size: 24),
-                            label: const Text(
-                              'Reserve Parking Slot',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
+                          ),
+                          icon: const Icon(Icons.event_available_rounded, size: 24),
+                          label: const Text(
+                            'Reserve Parking Slot',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Reservations List
-                  userId == null
-                      ? Container(
-                          padding: const EdgeInsets.all(32),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.login_rounded,
-                                size: 48,
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Reservations List
+                userId == null
+                    ? Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.login_rounded,
+                              size: 48,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Sign in to view reservations',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Sign in to view reservations',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : _ReservationsAndQr(userId: userId),
-                ],
-              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _ReservationsAndQr(userId: userId),
+              ]),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

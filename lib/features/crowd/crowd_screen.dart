@@ -450,66 +450,163 @@ class _CrowdScreenViewState extends ConsumerState<CrowdScreenView> {
     final user = ref.watch(authStateChangesProvider).asData?.value;
     final realisticService = ref.watch(realisticCrowdServiceProvider);
 
-    return RefreshIndicator(
+        return RefreshIndicator(
       onRefresh: _refreshAvailability,
-      child: SingleChildScrollView(
+      child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    Theme.of(context).colorScheme.primaryContainer.withOpacity(0.05),
-                  ],
+        slivers: [
+          // Sticky Header
+          SliverAppBar(
+            expandedHeight: 80.0,
+            floating: false,
+            pinned: true,
+            toolbarHeight: 60.0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      Theme.of(context).colorScheme.primaryContainer.withOpacity(0.05),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.groups_rounded,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Crowd Source',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+            ),
+          ),
+          
+          // Scrollable Content
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Zone Selection
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).shadowColor.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: DropdownButtonFormField<LotZoneOption>(
+                    value: _option,
+                    items: [
+                      for (final o in defaultSaritOptions)
+                        DropdownMenuItem(
+                          value: o,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_rounded,
+                                size: 20,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text('${o.lotName} — ${o.zoneName}'),
+                            ],
+                          ),
+                        )
+                    ],
+                    onChanged: (v) {
+                      setState(() => _option = v ?? _option);
+                      // Clear cache and load fresh data for new selection
+                      ref.read(availabilityStateProvider.notifier).clearCache();
+                      _loadAvailability();
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Select Parking Zone',
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                      prefixIcon: Icon(
+                        Icons.map_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildAvailabilityCard(),
+                const SizedBox(height: 32),
+                
+                // Action Section
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              Icons.groups_rounded,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              size: 28,
+                              Icons.report_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                              children: [
                                 Text(
-                                  'Crowd Source',
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                  'Report Changes',
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 Text(
-                                  'Real-time parking updates by the community',
+                                  'Help others by reporting when you see a slot become available or occupied.',
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
@@ -518,269 +615,152 @@ class _CrowdScreenViewState extends ConsumerState<CrowdScreenView> {
                             ),
                           ),
                         ],
-          ),
-          const SizedBox(height: 24),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).shadowColor.withOpacity(0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: DropdownButtonFormField<LotZoneOption>(
-                          value: _option,
-                          items: [
-                            for (final o in defaultSaritOptions)
-                              DropdownMenuItem(
-                                value: o,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on_rounded,
-                                      size: 20,
-                                      color: Theme.of(context).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text('${o.lotName} — ${o.zoneName}'),
-                                  ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.green, Colors.green.shade600],
                                 ),
-                              )
-                          ],
-                          onChanged: (v) {
-                            setState(() => _option = v ?? _option);
-                            // Clear cache and load fresh data for new selection
-                            ref.read(availabilityStateProvider.notifier).clearCache();
-                            _loadAvailability();
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Select Parking Zone',
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.all(16),
-                            prefixIcon: Icon(
-                              Icons.map_rounded,
-                              color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.green.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: FilledButton.icon(
+                                onPressed: user == null ? null : () async {
+                                  final pos = await _getLocation();
+                                  final success = await realisticService.submitRealisticReport(
+                                    userId: user.uid,
+                                    lotId: _option.lotId,
+                                    zoneId: _option.zoneId,
+                                    capacity: _option.capacity,
+                                    delta: 1, // +1 for free slot
+                                    lat: pos?.latitude,
+                                    lng: pos?.longitude,
+                                  );
+                                  
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(success 
+                                          ? 'Free slot reported successfully!' 
+                                          : 'Report rejected - no changes needed'),
+                                        backgroundColor: success ? Colors.green : Colors.orange,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                    if (success) {
+                                      _refreshAvailability(); // Refresh after successful report
+                                    }
+                                  }
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.add_circle_rounded, size: 24),
+                                label: const Text(
+                                  'Free Slot',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Container(
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.orange, Colors.orange.shade600],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: FilledButton.icon(
+                                onPressed: user == null ? null : () async {
+                                  final pos = await _getLocation();
+                                  final success = await realisticService.submitRealisticReport(
+                                    userId: user.uid,
+                                    lotId: _option.lotId,
+                                    zoneId: _option.zoneId,
+                                    capacity: _option.capacity,
+                                    delta: -1, // -1 for occupied slot
+                                    lat: pos?.latitude,
+                                    lng: pos?.longitude,
+                                  );
+                                  
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(success 
+                                          ? 'Occupied slot reported successfully!' 
+                                          : 'Report rejected - no changes needed'),
+                                        backgroundColor: success ? Colors.green : Colors.orange,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                    if (success) {
+                                      _refreshAvailability(); // Refresh after successful report
+                                    }
+                                  }
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.remove_circle_rounded, size: 24),
+                                label: const Text(
+                                  'Occupied',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ),
+              ]),
             ),
-            
-            // Content Section
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAvailabilityCard(),
-                  const SizedBox(height: 32),
-                  
-                  // Action Section
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.report_rounded,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Report Changes',
-                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Help others by reporting when you see a slot become available or occupied.',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [Colors.green, Colors.green.shade600],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.green.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: FilledButton.icon(
-                                  onPressed: user == null ? null : () async {
-                      final pos = await _getLocation();
-                                    final success = await realisticService.submitRealisticReport(
-                        userId: user.uid,
-                        lotId: _option.lotId,
-                        zoneId: _option.zoneId,
-                                      capacity: _option.capacity,
-                                      delta: 1, // +1 for free slot
-                        lat: pos?.latitude,
-                        lng: pos?.longitude,
-                                    );
-                                    
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(success 
-                                            ? 'Free slot reported successfully!' 
-                                            : 'Report rejected - no changes needed'),
-                                          backgroundColor: success ? Colors.green : Colors.orange,
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                      );
-                                      if (success) {
-                                        _refreshAvailability(); // Refresh after successful report
-                                      }
-                                    }
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.add_circle_rounded, size: 24),
-                                  label: const Text(
-                                    'Free Slot',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Container(
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [Colors.orange, Colors.orange.shade600],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.orange.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: FilledButton.icon(
-                                  onPressed: user == null ? null : () async {
-                      final pos = await _getLocation();
-                                    final success = await realisticService.submitRealisticReport(
-                        userId: user.uid,
-                        lotId: _option.lotId,
-                        zoneId: _option.zoneId,
-                                      capacity: _option.capacity,
-                                      delta: -1, // -1 for occupied slot
-                        lat: pos?.latitude,
-                        lng: pos?.longitude,
-                                    );
-                                    
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(success 
-                                            ? 'Occupied slot reported successfully!' 
-                                            : 'Report rejected - no changes needed'),
-                                          backgroundColor: success ? Colors.green : Colors.orange,
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                      );
-                                      if (success) {
-                                        _refreshAvailability(); // Refresh after successful report
-                                      }
-                                    }
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.remove_circle_rounded, size: 24),
-                                  label: const Text(
-                                    'Occupied',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
